@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Treadstorm</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <div id="hud">
+      <div id="damage"></div>
+      <div id="frost"></div>
+      <div id="burn"></div>
+
+      <div id="crosshair">
+        <svg viewBox="0 0 64 64">
+          <circle class="ring-bg" cx="32" cy="32" r="22" />
+          <circle id="reload-ring" cx="32" cy="32" r="22" />
+          <line class="tick" x1="32" y1="19" x2="32" y2="26" />
+          <line class="tick" x1="32" y1="38" x2="32" y2="45" />
+          <line class="tick" x1="19" y1="32" x2="26" y2="32" />
+          <line class="tick" x1="38" y1="32" x2="45" y2="32" />
+          <circle class="dot" cx="32" cy="32" r="1.4" />
+        </svg>
+      </div>
+      <div id="kill-msg"></div>
+      <div id="toast"></div>
+
+      <div id="minimap-wrap" class="panel-cut">
+        <canvas id="minimap" width="360" height="360"></canvas>
+        <div id="map-label"></div>
+      </div>
+
+      <div id="score-panel" class="panel-cut">
+        <div class="label">Kills</div>
+        <div class="value"><span id="kill-count">0</span><small id="kill-goal">/ 15</small></div>
+        <div class="progress"><div id="kill-progress"></div></div>
+        <div class="wallet"><i class="gem"></i><span id="crystal-count">0</span><span id="crystal-gain"></span></div>
+      </div>
+      <div id="killfeed"></div>
+
+      <div id="team-bar" class="hidden">
+        <div class="tb-side blue">
+          <span id="score-blue" class="tb-score">0</span>
+          <span id="flag-blue" class="flag-state hidden"></span>
+        </div>
+        <div class="tb-mid"><div id="team-goal">25</div><div id="team-mode">Kills</div></div>
+        <div class="tb-side red">
+          <span id="flag-red" class="flag-state hidden"></span>
+          <span id="score-red" class="tb-score">0</span>
+        </div>
+      </div>
+
+      <div id="buffs"></div>
+      <div id="status-panel" class="panel-cut">
+        <div class="status-head"><span class="swatch" id="player-swatch"></span>YOU<span id="weapon-name" class="weapon-tag"></span></div>
+        <div class="bar-label"><span>Hull</span><span id="hp-text">100</span></div>
+        <div class="bar hp"><div id="hp-fill" class="fill"></div></div>
+        <div class="bar-label"><span id="weapon-label">Cannon</span><span id="reload-text">READY</span></div>
+        <div class="bar small"><div id="reload-fill" class="fill"></div></div>
+      </div>
+
+      <div id="respawn" class="hidden">
+        <div class="title">Destroyed</div>
+        <div id="respawn-by"></div>
+        <div id="respawn-time"></div>
+      </div>
+
+      <div id="scoreboard" class="hidden panel-cut">
+        <div class="sb-title">Scoreboard</div>
+        <table>
+          <thead><tr><th>Player</th><th>Turret</th><th>Kills</th><th>Deaths</th></tr></thead>
+          <tbody id="score-rows"></tbody>
+        </table>
+      </div>
+
+      <div id="net-badge" class="panel-cut hidden"></div>
+      <div id="perf" class="panel-cut"><b id="perf-fps">--</b><span>FPS</span><small id="perf-ms"></small></div>
+      <div id="hint">Hold <kbd>Tab</kbd> scoreboard &middot; <kbd>M</kbd> sound <span id="sound-state">on</span></div>
+    </div>
+
+    <div id="start" class="overlay">
+      <div class="menu wide panel-cut">
+        <div class="menu-head">
+          <div class="logo">TREAD<span>STORM</span></div>
+          <p class="tagline">Tank arena &middot; free-for-all, team deathmatch and capture the flag</p>
+          <div class="wallet big" title="Crystals"><i class="gem"></i><span id="menu-crystals">0</span></div>
+        </div>
+        <div class="tabs">
+          <button class="tab active" data-tab="battle">Battle</button>
+          <button class="tab" data-tab="garage">Garage</button>
+        </div>
+
+        <div id="tab-garage" class="hidden">
+          <div class="garage">
+            <div>
+              <div class="section-label">Hull</div>
+              <div id="hull-cards" class="cards cards-3"></div>
+              <div class="section-label">Turret</div>
+              <div id="weapon-cards" class="cards cards-3"></div>
+              <p class="note muted">Earn crystals: 10 per kill, 100 per win, 25 from crystal crates.</p>
+            </div>
+            <div id="garage-detail" class="detail"></div>
+          </div>
+        </div>
+
+        <div id="tab-battle" class="menu-body">
+          <div>
+            <div class="section-label">Mode</div>
+            <div id="mode-cards" class="cards cards-3"></div>
+            <div class="section-label">Map</div>
+            <div id="map-cards" class="cards cards-3"></div>
+            <div id="map-note" class="note hidden">Changing the mode or map restarts the match</div>
+            <div class="section-label">Loadout</div>
+            <div class="loadout-row">
+              <div id="loadout" class="loadout"></div>
+              <button id="to-garage" class="ghost small">Garage</button>
+            </div>
+            <div class="section-label">Online</div>
+            <div class="online-row">
+              <input id="net-name" class="txt" maxlength="14" placeholder="Your name" autocomplete="off" />
+              <input id="net-url" class="txt wide" placeholder="Server address" autocomplete="off" spellcheck="false" />
+              <button id="net-join" class="ghost small">Join online</button>
+              <button id="net-rooms" class="ghost small">Rooms</button>
+            </div>
+            <div id="net-status" class="note muted"></div>
+          </div>
+          <div>
+            <div class="section-label">Controls</div>
+            <div class="keys compact">
+              <div class="key-row"><span class="caps"><kbd>W</kbd><kbd>S</kbd></span><span>Drive</span></div>
+              <div class="key-row"><span class="caps"><kbd>A</kbd><kbd>D</kbd></span><span>Rotate hull</span></div>
+              <div class="key-row"><span class="caps"><kbd>Z</kbd><kbd>X</kbd></span><span>Rotate turret</span></div>
+              <div class="key-row"><span class="caps"><kbd>C</kbd></span><span>Center turret</span></div>
+              <div class="key-row"><span class="caps"><kbd class="wide">Space</kbd></span><span>Fire</span></div>
+              <div class="key-row"><span class="caps"><kbd>Q</kbd><kbd>E</kbd></span><span>Zoom out / in</span></div>
+              <div class="key-row"><span class="caps"><kbd class="wide">Tab</kbd></span><span>Scoreboard</span></div>
+              <div class="key-row"><span class="caps"><kbd>M</kbd></span><span>Sound on / off</span></div>
+              <div class="key-row"><span class="caps"><kbd>F</kbd></span><span>FPS display on / off</span></div>
+              <div class="key-row"><span class="caps"><kbd class="wide">Esc</kbd></span><span>Menu / pause</span></div>
+            </div>
+            <div class="section-label">Bonus crates</div>
+            <div id="legend" class="legend"></div>
+            <div class="section-label">Graphics</div>
+            <div id="quality-seg" class="seg">
+              <button data-q="auto">Auto</button><button data-q="low">Low</button><button data-q="medium">Balanced</button><button data-q="high">High</button>
+            </div>
+            <div id="quality-note" class="note muted"></div>
+          </div>
+        </div>
+        <div class="menu-foot"><button id="play-btn">Play</button></div>
+      </div>
+    </div>
+
+    <div id="win" class="overlay hidden">
+      <div class="menu panel-cut">
+        <div id="win-title" class="logo">VICTORY</div>
+        <p id="win-tagline" class="tagline"></p>
+        <div id="win-stats"></div>
+        <div class="btn-row">
+          <button id="restart-btn">Restart</button>
+          <button id="menu-btn" class="ghost">Menu</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="lobby" class="overlay hidden">
+      <div class="menu panel-cut lobby-box">
+        <div class="logo small-logo">ONLINE ROOMS</div>
+        <p id="lobby-server" class="tagline"></p>
+        <div id="lobby-list" class="lobby-list"></div>
+        <div class="section-label">Open a new room</div>
+        <div class="online-row">
+          <select id="lobby-map" class="txt"></select>
+          <select id="lobby-mode" class="txt"></select>
+          <button id="lobby-create" class="ghost small">Open room</button>
+        </div>
+        <div id="lobby-msg" class="note muted"></div>
+        <div class="btn-row"><button id="lobby-close" class="ghost">Back</button></div>
+      </div>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

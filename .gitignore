@@ -1,0 +1,9 @@
+node_modules
+dist
+dist-server
+*.zip
+war-env-screens
+playtest-1080p
+itch-assets
+index (3).html
+.claude

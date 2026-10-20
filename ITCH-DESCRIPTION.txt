@@ -1,0 +1,52 @@
+TREADSTORM
+
+A fast 3D tank arena you play right in your browser. Drive, aim your turret, and fight bots across four battlefields, from a quarry pit to a war-torn zone under a giant broken overpass. No download, no account, no waiting.
+
+HOW TO PLAY
+Click Play, pick a mode, a map and your tank, and shoot your way to victory. Click the game once so sound can start.
+
+CONTROLS (keyboard)
+W / S : drive forward / reverse
+A / D : turn the hull
+Z / X : rotate the turret
+C : centre the turret
+Space : fire
+Q / E : zoom out / in (zoom all the way out for a top-down view)
+Tab : scoreboard (hold)
+M : sound on / off
+F : show / hide the FPS counter
+Esc : menu / pause
+
+GAME MODES
+Free-for-all: every tank for itself, first to 15 kills wins.
+Team Deathmatch: blue vs red, 4 on 4, first team to 25 kills.
+Capture the Flag: steal the enemy flag and bring it home, first to 3 captures.
+
+MAPS
+Quarry: an open dirt pit with excavators, dump trucks and bunkers.
+Depot: a ruined container yard with warehouses and gantry cranes.
+Frostbite: a snowy outpost with ice blocks and frozen wrecks.
+Warzone: a burning battlefield under a huge collapsed overpass, with thunder and lightning.
+
+TURRETS
+Cannon: balanced shells.
+Blaster: rapid twin-barrel fire.
+Flamer: a fire stream that keeps enemies burning after you stop.
+Railgun: a charged beam that pierces tanks.
+Freezer: an icy stream that slows enemy movement and turning.
+Ricochet: plasma balls that bounce off walls and cover, but never off tanks.
+Hammer: a shotgun. Ten pellets per blast, devastating up close and weak from far away.
+
+GARAGE
+Earn crystals for every kill and win, then upgrade your hull (Scout, Warden or Bastion) and turrets across five levels. Crystal crates drop from the sky, along with repair kits, double armor, double damage and nitro.
+
+GRAPHICS AND PERFORMANCE
+The game starts on Auto quality and lowers itself if your computer struggles. You can also choose Low, Balanced or High in the menu. If it feels slow, pick Low. Press F to see your frames per second.
+
+GOOD TO KNOW
+- You play against computer-controlled bots (single player).
+- Needs a keyboard, so it won't work on phones. Works best in Chrome or Edge on a computer.
+- Your crystals and upgrades are saved in your browser. Clearing your browser's site data will reset them.
+
+BUILT WITH
+JavaScript and Three.js. All sounds are generated in code. Some 3D turret models were made with an AI 3D generator, and the game's code was written with an AI assistant.

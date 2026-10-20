@@ -1,0 +1,12 @@
+# Render.com blueprint: a free web service that runs the Treadstorm game server.
+services:
+  - type: web
+    name: treadstorm-server
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ALLOW_ORIGINS
+        value: "*.itch.zone,https://meno-g.itch.io"   # who may connect (empty = anybody)
+      - key: MAX_ROOMS
+        value: "2"                                         # a free server is small; keep few rooms
