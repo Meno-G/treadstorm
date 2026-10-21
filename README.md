@@ -78,3 +78,6 @@ node server/tests/load-meter.mjs     # how steady the server loop is under load
 
 ## Credits
 Built with [three.js](https://threejs.org) and [ws](https://github.com/websockets/ws). The Freezer, Ricochet and Hammer turret models were generated with Hyper3D Rodin and optimized for the web. Sound is synthesized in code; there are no audio files.
+
+## License
+[MIT](LICENSE) © 2026 Meno-G. The code and the included game assets (turret models, textures generated in code) may be used, changed and shared under it.
