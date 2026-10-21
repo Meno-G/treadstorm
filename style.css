@@ -840,3 +840,29 @@ body.touch #killfeed { top: 196px; }
   #tc-full { left: auto; right: calc(64px + env(safe-area-inset-right)); top: 92px; width: 50px; height: 34px; border-radius: 8px; }
 }
 body.touch .tc-btn.small { min-height: 0; }
+body.touch .online-row select.txt { flex: 1; min-width: 0; }
+
+/* the smallest phones (iPhone SE and the like, about 320 px tall) */
+@media (max-height: 340px) {
+  .tc-stick { width: 104px; height: 104px; bottom: calc(8px + env(safe-area-inset-bottom)); }
+  .tc-knob { width: 46px; height: 46px; margin: -23px 0 0 -23px; }
+  #tc-move { left: calc(12px + env(safe-area-inset-left)); }
+  #tc-aim { right: calc(104px + env(safe-area-inset-right)); }
+  #tc-fire { width: 80px; height: 80px; right: calc(12px + env(safe-area-inset-right)); bottom: calc(22px + env(safe-area-inset-bottom)); font-size: 15px; }
+  #tc-center { width: 46px; height: 46px; right: calc(16px + env(safe-area-inset-right)); bottom: calc(112px + env(safe-area-inset-bottom)); }
+  .tc-label { display: none; }
+  body.touch #minimap { width: 80px; height: 80px; }
+  body.touch #perf { left: 120px; }
+  body.touch #net-badge { left: 120px; top: 30px; }
+  body.touch #status-panel { top: 98px; width: 124px; padding: 4px 8px 6px; }
+  body.touch #score-panel { transform: scale(0.6); }
+  body.touch #killfeed { top: 100px; }
+  body.touch #tc-full, body.touch #tc-menu { top: 66px; }
+  body.touch #toast { top: 14%; font-size: 12px; }
+}
+
+/* a tablet held upright: the sticks are at the bottom corners, so the health panel goes above them */
+@media (orientation: portrait) and (min-width: 701px) {
+  body.touch #status-panel { left: 24px; bottom: 190px; }
+  body.touch #buffs { left: 24px; bottom: 330px; }
+}
