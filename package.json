@@ -22,5 +22,19 @@
     "vite": "^8.3.4",
     "three": "^0.186.1"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "description": "3D tank arena for the browser with bots and online multiplayer (three.js + Node)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Meno-G/treadstorm.git"
+  },
+  "homepage": "https://meno-g.itch.io/treadstorm",
+  "keywords": [
+    "game",
+    "tanks",
+    "three.js",
+    "multiplayer",
+    "websocket",
+    "webgl"
+  ]
 }
