@@ -758,6 +758,7 @@ html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent
 .tc-btn.on, .tc-btn.on:hover { background: #ffd978; transform: scale(0.94); }
 #tc-fire { right: calc(24px + env(safe-area-inset-right)); bottom: calc(40px + env(safe-area-inset-bottom)); width: 112px; height: 112px; font-size: 18px; }
 .tc-btn.small {
+  padding: 0 !important;
   width: 64px; height: 64px; font-size: 10px; color: var(--text); background: rgba(20, 28, 38, 0.7); border-color: rgba(255, 255, 255, 0.35);
 }
 #tc-center { right: calc(34px + env(safe-area-inset-right)); bottom: calc(170px + env(safe-area-inset-bottom)); }
@@ -765,3 +766,77 @@ html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent
 .tc-btn.small:hover, .tc-btn.small:active { background: rgba(20, 28, 38, 0.7); }
 .tc-btn.small.on, .tc-btn.small.on:hover { background: rgba(60, 80, 100, 0.9); }
 body.touch #hint { display: none; }
+
+/* ---------- Phones and tablets: layout ---------- */
+body.touch { position: fixed; inset: 0; overflow: hidden; }
+body.touch canvas { touch-action: none; }
+body.touch .txt { font-size: 16px; } /* (a smaller size makes iPhones zoom into the box) */
+body.touch button { min-height: 44px; }
+body.touch .controls-col { display: none; }
+#rotate { display: none; }
+@media (orientation: portrait) and (max-width: 700px) {
+  body.touch #rotate {
+    position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    background: #0b1016; color: var(--text); font: 700 22px var(--font); letter-spacing: 2px; text-align: center; text-transform: uppercase;
+  }
+  body.touch #rotate small { font-size: 12px; font-weight: 500; letter-spacing: 1px; color: var(--muted); text-transform: none; }
+  .rot-icon { font-size: 64px; color: var(--accent); animation: rot-turn 2.4s ease-in-out infinite; }
+}
+@keyframes rot-turn { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+
+#tc-full { left: calc(300px + env(safe-area-inset-left)); top: calc(14px + env(safe-area-inset-top)); width: 56px; height: 40px; border-radius: 8px; }
+
+/* tablets and bigger screens */
+body.touch #status-panel { left: 210px; width: 270px; bottom: 22px; }
+body.touch #buffs { left: 210px; bottom: 150px; }
+body.touch #tc-menu { left: auto; right: calc(24px + env(safe-area-inset-right)); top: 142px; }
+body.touch #tc-full { left: auto; right: calc(96px + env(safe-area-inset-right)); top: 142px; }
+body.touch #killfeed { top: 196px; }
+
+/* a phone held sideways: everything smaller, the HUD out of the thumbs' way */
+@media (max-height: 520px) {
+  /* menus */
+  body.touch .overlay { padding: 6px; }
+  body.touch .menu { padding: 14px 18px 16px; }
+  body.touch .menu.wide { padding: 8px 14px 10px; }
+  body.touch .menu.wide .logo, body.touch .logo { font-size: 26px; letter-spacing: 4px; }
+  body.touch .tagline { display: none; }
+  body.touch .wallet.big { transform: scale(0.8); transform-origin: top right; }
+  body.touch .tabs .tab { padding: 6px 14px; font-size: 12px; }
+  body.touch .section-label { margin: 8px 0 5px; }
+  body.touch .menu-body { grid-template-columns: 1fr; gap: 0; }
+  body.touch .card { padding: 6px 8px; }
+  body.touch .card p, body.touch .card .desc { font-size: 11px; }
+  body.touch .menu-foot { position: sticky; bottom: -6px; margin-top: 8px; padding: 8px 0 4px; background: var(--panel-solid); z-index: 2; }
+  body.touch .menu-foot button { padding: 10px 44px; }
+  body.touch .online-row .txt { width: 100px; }
+  body.touch .small-logo { font-size: 22px; }
+
+  /* the screen while playing */
+  body.touch #minimap-wrap { top: 8px; left: 8px; padding: 5px 5px 3px; }
+  body.touch #minimap { width: 104px; height: 104px; }
+  body.touch #map-label { display: none; }
+  body.touch #perf { top: 8px; left: 158px; padding: 3px 8px; }
+  body.touch #perf b { font-size: 14px; }
+  body.touch #perf small { display: none; }
+  body.touch #net-badge { top: 36px; left: 158px; font-size: 10px; padding: 2px 8px; }
+  body.touch #score-panel { top: 8px; right: 8px; transform: scale(0.72); transform-origin: top right; }
+  body.touch #killfeed { top: 132px; right: 8px; }
+  body.touch .kf { font-size: 11px; padding: 3px 8px; }
+  body.touch #team-bar { top: 8px; transform: translateX(-50%) scale(0.72); transform-origin: top center; }
+  body.touch #status-panel { left: 8px; top: 124px; bottom: auto; width: 150px; padding: 6px 10px 8px; }
+  body.touch #status-panel .status-head { margin-bottom: 2px; font-size: 12px; }
+  body.touch #buffs { left: 50%; transform: translateX(-50%); bottom: 112px; }
+  body.touch .buff { width: 170px; padding: 3px 8px 3px 6px; font-size: 11px; }
+  body.touch #toast { top: 18%; font-size: 15px; letter-spacing: 3px; }
+  body.touch #scoreboard { transform: scale(0.8); }
+  .tc-btn.small { letter-spacing: 0.5px; font-size: 10px; }
+  .tc-stick { width: 128px; height: 128px; bottom: calc(18px + env(safe-area-inset-bottom)); }
+  .tc-knob { width: 54px; height: 54px; margin: -27px 0 0 -27px; }
+  #tc-aim { right: calc(132px + env(safe-area-inset-right)); }
+  #tc-fire { width: 96px; height: 96px; bottom: calc(34px + env(safe-area-inset-bottom)); }
+  #tc-center { bottom: calc(142px + env(safe-area-inset-bottom)); right: calc(30px + env(safe-area-inset-right)); width: 56px; height: 56px; }
+  #tc-menu { left: auto; right: calc(8px + env(safe-area-inset-right)); top: 92px; width: 50px; height: 34px; }
+  #tc-full { left: auto; right: calc(64px + env(safe-area-inset-right)); top: 92px; width: 50px; height: 34px; border-radius: 8px; }
+}
+body.touch .tc-btn.small { min-height: 0; }

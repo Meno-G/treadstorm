@@ -6790,6 +6790,31 @@ if (touchOn) {
   button($('tc-fire'), () => { keys.Space = true; }, () => { keys.Space = false; });
   button($('tc-center'), () => { keys.KeyC = true; if (state === 'playing') player.centering = true; }, () => { keys.KeyC = false; });
   button($('tc-menu'), () => { if (state === 'playing') pause(); });
+  // full screen (not offered where the browser has none, e.g. iPhones)
+  const full = $('tc-full');
+  if (document.documentElement.requestFullscreen) {
+    button(full, () => {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen().then(() => screen.orientation?.lock?.('landscape').catch(() => {})).catch(() => {});
+    });
+  } else full.style.display = 'none';
+  // pinch on the picture: spread the fingers = closer, pinch = further out (the same zoom as Q / E)
+  const fingers = new Map();
+  let pinch = 0;
+  const cv = renderer.domElement;
+  cv.addEventListener('pointerdown', (e) => { fingers.set(e.pointerId, [e.clientX, e.clientY]); pinch = 0; });
+  cv.addEventListener('pointermove', (e) => {
+    if (!fingers.has(e.pointerId)) return;
+    fingers.set(e.pointerId, [e.clientX, e.clientY]);
+    if (fingers.size !== 2 || state !== 'playing') return;
+    const [a, b] = [...fingers.values()];
+    const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+    if (pinch) zoomTarget = clamp(zoomTarget - (d - pinch) / 260, ZOOM_MIN, ZOOM_MAX);
+    pinch = d;
+  });
+  const lift = (e) => { fingers.delete(e.pointerId); pinch = 0; };
+  cv.addEventListener('pointerup', lift);
+  cv.addEventListener('pointercancel', lift);
   document.addEventListener('contextmenu', (e) => e.preventDefault());
   // shown only while a match is running (the menus are for fingers already)
   let shown = false;
