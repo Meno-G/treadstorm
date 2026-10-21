@@ -6729,7 +6729,9 @@ document.addEventListener('pointerdown', () => Sound.init(), { once: true });
 setInterval(() => { if (document.hidden) netHush(); }, 1000);
 // ---------- Touch controls ----------
 // Two thumb sticks and a few buttons that press the same keys as the keyboard, so everything else (online play too) is unchanged.
-// Left stick: up / down = W / S (drive), left / right = A / D (turn the hull). Right stick: left / right = Z / X (turn the turret).
+// Left stick: up / down = W / S (drive), left / right = A / D (turn the hull). Dragging a finger on the picture turns the turret
+// (left = look left) and zooms (up = closer, down = further); two fingers pinch to zoom; + / - buttons zoom too.
+let touchTick = () => {}; // run every frame; set up below (the turret follows the finger)
 if (IS_TOUCH) {
   document.body.classList.add('touch');
   const root = $('touch');
@@ -6772,10 +6774,6 @@ if (IS_TOUCH) {
     keys.KeyA = dx < -DEAD;
     keys.KeyD = dx > DEAD;
   });
-  stick($('tc-aim'), (dx) => {
-    keys.KeyZ = dx < -DEAD;
-    keys.KeyX = dx > DEAD;
-  });
   // a button that holds a key while it is pressed (or runs `down` once)
   const button = (el, down, up) => {
     let id = null;
@@ -6797,6 +6795,8 @@ if (IS_TOUCH) {
     el.addEventListener('pointercancel', end);
   };
   button($('tc-fire'), () => { keys.Space = true; }, () => { keys.Space = false; });
+  button($('tc-zin'), () => { keys.KeyE = true; }, () => { keys.KeyE = false; });
+  button($('tc-zout'), () => { keys.KeyQ = true; }, () => { keys.KeyQ = false; });
   button($('tc-center'), () => { keys.KeyC = true; if (state === 'playing') player.centering = true; }, () => { keys.KeyC = false; });
   button($('tc-menu'), () => { if (state === 'playing') pause(); });
   // full screen (not offered where the browser has none, e.g. iPhones)
@@ -6807,23 +6807,52 @@ if (IS_TOUCH) {
       else document.documentElement.requestFullscreen().then(() => screen.orientation?.lock?.('landscape').catch(() => {})).catch(() => {});
     });
   } else full.style.display = 'none';
-  // pinch on the picture: spread the fingers = closer, pinch = further out (the same zoom as Q / E)
+  // The picture: one finger dragged sideways turns the turret toward where the finger goes (the turret follows `aimTarget`
+  // by holding Z / X, so online play is unchanged); dragged up / down it zooms; two fingers pinch.
   const fingers = new Map();
-  let pinch = 0;
+  let pinch = 0, aimTarget = null, held = 0;
   const cv = renderer.domElement;
-  cv.addEventListener('pointerdown', (e) => { fingers.set(e.pointerId, [e.clientX, e.clientY]); pinch = 0; });
+  const AIM_PER_PX = 2.6 / Math.max(window.innerWidth, 500); // radians of turret per pixel of finger
+  cv.addEventListener('pointerdown', (e) => { fingers.set(e.pointerId, [e.clientX, e.clientY]); pinch = 0; Sound.init(); });
   cv.addEventListener('pointermove', (e) => {
-    if (!fingers.has(e.pointerId)) return;
-    fingers.set(e.pointerId, [e.clientX, e.clientY]);
-    if (fingers.size !== 2 || state !== 'playing') return;
-    const [a, b] = [...fingers.values()];
-    const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
-    if (pinch) zoomTarget = clamp(zoomTarget - (d - pinch) / 260, ZOOM_MIN, ZOOM_MAX);
-    pinch = d;
+    const was = fingers.get(e.pointerId);
+    if (!was) return;
+    const now = [e.clientX, e.clientY];
+    fingers.set(e.pointerId, now);
+    if (state !== 'playing') return;
+    if (fingers.size === 2) {
+      const [a, b] = [...fingers.values()];
+      const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      if (pinch) zoomTarget = clamp(zoomTarget - (d - pinch) / 260, ZOOM_MIN, ZOOM_MAX);
+      pinch = d;
+      return;
+    }
+    const dx = now[0] - was[0], dy = now[1] - was[1];
+    if (Math.abs(dx) >= Math.abs(dy) * 0.67) {
+      // the finger went left = the turret turns left (+ is left)
+      const lead = clamp((aimTarget ?? player.turretYaw) - dx * AIM_PER_PX, player.turretYaw - 1.2, player.turretYaw + 1.2);
+      aimTarget = lead;
+    }
+    if (Math.abs(dy) > Math.abs(dx) * 1.5) zoomTarget = clamp(zoomTarget + dy * 0.004, ZOOM_MIN, ZOOM_MAX); // up = closer
   });
   const lift = (e) => { fingers.delete(e.pointerId); pinch = 0; };
   cv.addEventListener('pointerup', lift);
   cv.addEventListener('pointercancel', lift);
+  // every frame: hold the turret key that brings the turret toward the target, release it when there
+  touchTick = () => {
+    if (aimTarget === null || !player.alive) {
+      if (held) { keys.KeyZ = keys.KeyX = false; held = 0; }
+      return;
+    }
+    const diff = angleDiff(aimTarget, player.turretYaw);
+    const want = Math.abs(diff) < 0.035 ? 0 : diff > 0 ? 1 : -1;
+    if (want !== held) {
+      keys.KeyZ = want === 1;
+      keys.KeyX = want === -1;
+      held = want;
+    }
+    if (!want && fingers.size === 0) aimTarget = null;
+  };
   document.addEventListener('contextmenu', (e) => e.preventDefault());
   // shown only while a match is running (the menus are for fingers already)
   let shown = false;
@@ -7530,6 +7559,7 @@ let elapsed = 0;
 
 let skyTime = 0; // keeps running in the menu so clouds and smoke never freeze
 function step(dt) {
+  touchTick();
   if (net.on) {
     elapsed += dt;
     netUpdate(dt);

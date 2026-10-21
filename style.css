@@ -772,7 +772,7 @@ body.touch { position: fixed; inset: 0; overflow: hidden; }
 body.touch canvas { touch-action: none; }
 body.touch .txt { font-size: 16px; } /* (a smaller size makes iPhones zoom into the box) */
 body.touch button { min-height: 44px; }
-body.touch .controls-col { display: none; }
+body.touch .kbd-only { display: none; }
 #rotate { display: none; }
 @media (orientation: portrait) and (max-width: 700px) {
   body.touch #rotate {
@@ -865,4 +865,58 @@ body.touch .online-row select.txt { flex: 1; min-width: 0; }
 @media (orientation: portrait) and (min-width: 701px) {
   body.touch #status-panel { left: 24px; bottom: 190px; }
   body.touch #buffs { left: 24px; bottom: 330px; }
+}
+
+/* ---------- Touch: final positions of the on-screen buttons (tablet, phone sideways, smallest phone) ---------- */
+body.touch #tc-menu, body.touch #tc-full, body.touch #tc-zin, body.touch #tc-zout {
+  left: auto; top: 142px; width: 56px; height: 40px; border-radius: 8px; min-height: 0;
+}
+body.touch #tc-menu { right: calc(24px + env(safe-area-inset-right)); }
+body.touch #tc-full { right: calc(96px + env(safe-area-inset-right)); }
+body.touch #tc-zin { right: calc(168px + env(safe-area-inset-right)); }
+body.touch #tc-zout { right: calc(240px + env(safe-area-inset-right)); }
+.tc-btn.zoom { font-size: 24px; letter-spacing: 0; line-height: 1; }
+@media (max-height: 520px) {
+  body.touch #tc-menu, body.touch #tc-full, body.touch #tc-zin, body.touch #tc-zout { top: 92px; width: 50px; height: 34px; }
+  body.touch #tc-menu { right: calc(8px + env(safe-area-inset-right)); }
+  body.touch #tc-full { right: calc(64px + env(safe-area-inset-right)); }
+  body.touch #tc-zin { right: calc(120px + env(safe-area-inset-right)); }
+  body.touch #tc-zout { right: calc(176px + env(safe-area-inset-right)); }
+  .tc-btn.zoom { font-size: 22px; }
+}
+@media (max-height: 340px) {
+  body.touch #tc-menu, body.touch #tc-full, body.touch #tc-zin, body.touch #tc-zout { top: 66px; }
+}
+
+/* ---------- Touch: the Battle menu, made to fit a phone held sideways without scrolling ---------- */
+body.touch #net-url { display: none; } /* the game already knows the server address */
+@media (max-height: 520px) {
+  body.touch .menu-body { grid-template-columns: minmax(0, 1fr) minmax(130px, 190px); gap: 12px; }
+  body.touch .menu-body > div { min-width: 0; }
+  body.touch .menu.wide { max-width: 100%; }
+  body.touch .section-label { margin: 6px 0 3px; font-size: 10px; }
+  body.touch .card { padding: 6px 8px; }
+  body.touch .card .desc { display: none; }
+  body.touch .card canvas { display: none; }
+  body.touch .card .name { font-size: 13px; letter-spacing: 0.5px; }
+  body.touch #map-cards { grid-template-columns: repeat(4, 1fr); }
+  body.touch #map-note { display: none; }
+  body.touch .loadout-row { gap: 8px; }
+  body.touch .online-row { gap: 6px; }
+  body.touch .online-row .txt { flex: 1; width: auto; }
+  body.touch .online-row button { padding: 6px 12px; font-size: 12px; letter-spacing: 1px; }
+  body.touch #net-status { margin-top: 3px; font-size: 11px; }
+  body.touch .seg { flex-wrap: wrap; }
+  body.touch .seg button { flex: 1 1 44%; padding: 10px 2px; font-size: 12px; }
+  body.touch #quality-note { font-size: 11px; }
+  body.touch .menu.wide { padding: 6px 12px 6px; }
+  body.touch .menu-head { margin-bottom: 0; }
+  body.touch .tabs { margin: 2px 0 0; }
+  body.touch .menu-foot { margin-top: 4px; padding: 4px 0 2px; bottom: -4px; }
+  body.touch .menu-foot button { padding: 8px 40px; min-height: 40px; }
+  body.touch .lobby-box { padding: 10px 16px 12px; }
+  body.touch .lobby-list { margin: 4px 0 8px; min-height: 0; max-height: 120px; overflow-y: auto; }
+  body.touch .lobby-row { padding: 6px 10px; }
+  body.touch .lobby-row button { padding: 6px 14px; min-height: 36px; }
+  body.touch .lobby-box .btn-row button { padding: 8px 40px; min-height: 40px; }
 }
