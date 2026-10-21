@@ -9,7 +9,7 @@ Built with plain JavaScript and [three.js](https://threejs.org), with a small No
 
 ## Features
 - **4 maps:** Quarry, Depot, Frostbite and Warzone (a huge collapsed overpass, ruins, fires, a smoky sky).
-- **3 hulls and 6 turrets:** Cannon, Blaster, Railgun, Flamer, Freezer, Ricochet and Hammer (a shotgun), each with its own sound and effects.
+- **3 hulls and 7 turrets:** Cannon, Blaster, Railgun, Flamer, Freezer, Ricochet and Hammer (a shotgun), each with its own sound and effects.
 - **3 modes:** Free-for-all, Team Deathmatch and Capture the Flag, with bots that path-find and play the objective.
 - **Garage:** earn crystals from kills, wins and crates, and upgrade your hull and turret.
 - **Bonus crates:** repair, double armor, double damage, nitro and crystals drop by parachute.
