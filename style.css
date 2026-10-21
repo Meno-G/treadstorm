@@ -731,3 +731,37 @@ select.txt option { color: #111; }
   color: #45d16a;
 }
 #net-badge.hidden { display: none; }
+
+/* ---------- Touch controls (phones and tablets) ---------- */
+html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+#touch, #touch * { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+#touch { position: fixed; inset: 0; z-index: 20; pointer-events: none; }
+#touch.hidden { display: none; }
+.tc-stick {
+  position: absolute; bottom: calc(22px + env(safe-area-inset-bottom)); width: 150px; height: 150px; border-radius: 50%;
+  pointer-events: auto; background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.28);
+}
+#tc-move { left: calc(26px + env(safe-area-inset-left)); }
+#tc-aim { right: calc(150px + env(safe-area-inset-right)); }
+.tc-knob {
+  position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
+  background: rgba(255, 194, 61, 0.55); border: 2px solid rgba(255, 194, 61, 0.9);
+}
+.tc-stick.on { background: rgba(255, 255, 255, 0.16); }
+.tc-label { position: absolute; left: 0; right: 0; bottom: -18px; text-align: center; font: 700 11px var(--font); letter-spacing: 2px; color: rgba(255, 255, 255, 0.55); }
+.tc-btn {
+  position: absolute; pointer-events: auto; font: 700 15px var(--font); letter-spacing: 1.5px; color: #15110a; text-transform: uppercase;
+  background: rgba(255, 194, 61, 0.75); border: 2px solid rgba(255, 220, 140, 0.95); border-radius: 50%; padding: 0;
+  clip-path: none; transition: none; /* (the menu buttons' slanted shape does not apply here) */
+}
+.tc-btn:hover, .tc-btn:active { transform: none; background: rgba(255, 194, 61, 0.75); }
+.tc-btn.on, .tc-btn.on:hover { background: #ffd978; transform: scale(0.94); }
+#tc-fire { right: calc(24px + env(safe-area-inset-right)); bottom: calc(40px + env(safe-area-inset-bottom)); width: 112px; height: 112px; font-size: 18px; }
+.tc-btn.small {
+  width: 64px; height: 64px; font-size: 10px; color: var(--text); background: rgba(20, 28, 38, 0.7); border-color: rgba(255, 255, 255, 0.35);
+}
+#tc-center { right: calc(34px + env(safe-area-inset-right)); bottom: calc(170px + env(safe-area-inset-bottom)); }
+#tc-menu { left: calc(240px + env(safe-area-inset-left)); top: calc(14px + env(safe-area-inset-top)); width: 56px; height: 40px; border-radius: 8px; }
+.tc-btn.small:hover, .tc-btn.small:active { background: rgba(20, 28, 38, 0.7); }
+.tc-btn.small.on, .tc-btn.small.on:hover { background: rgba(60, 80, 100, 0.9); }
+body.touch #hint { display: none; }

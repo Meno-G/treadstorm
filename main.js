@@ -6717,6 +6717,91 @@ function netHush() {
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden) netHush(); });
 setInterval(() => { if (document.hidden) netHush(); }, 1000);
+// ---------- Touch controls ----------
+// Two thumb sticks and a few buttons that press the same keys as the keyboard, so everything else (online play too) is unchanged.
+// Left stick: up / down = W / S (drive), left / right = A / D (turn the hull). Right stick: left / right = Z / X (turn the turret).
+const touchOn = matchMedia('(pointer: coarse)').matches || new URLSearchParams(location.search).has('touch');
+if (touchOn) {
+  document.body.classList.add('touch');
+  const root = $('touch');
+  const DEAD = 0.3;
+  // a stick: the knob follows the thumb inside the circle; `apply(dx, dy)` gets the push as -1..1 on each side
+  const stick = (el, apply) => {
+    const knob = el.querySelector('.tc-knob');
+    let id = null;
+    const move = (e) => {
+      const r = el.getBoundingClientRect();
+      const R = r.width / 2;
+      let dx = (e.clientX - (r.left + R)) / R, dy = (e.clientY - (r.top + R)) / R;
+      const len = Math.hypot(dx, dy);
+      if (len > 1) { dx /= len; dy /= len; }
+      knob.style.transform = `translate(${dx * R * 0.7}px, ${dy * R * 0.7}px)`;
+      apply(dx, dy);
+    };
+    const end = (e) => {
+      if (e.pointerId !== id) return;
+      id = null;
+      el.classList.remove('on');
+      knob.style.transform = '';
+      apply(0, 0);
+    };
+    el.addEventListener('pointerdown', (e) => {
+      if (id !== null) return;
+      id = e.pointerId;
+      el.setPointerCapture(id);
+      el.classList.add('on');
+      Sound.init();
+      move(e);
+    });
+    el.addEventListener('pointermove', (e) => { if (e.pointerId === id) move(e); });
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+  };
+  stick($('tc-move'), (dx, dy) => {
+    keys.KeyW = dy < -DEAD;
+    keys.KeyS = dy > DEAD;
+    keys.KeyA = dx < -DEAD;
+    keys.KeyD = dx > DEAD;
+  });
+  stick($('tc-aim'), (dx) => {
+    keys.KeyZ = dx < -DEAD;
+    keys.KeyX = dx > DEAD;
+  });
+  // a button that holds a key while it is pressed (or runs `down` once)
+  const button = (el, down, up) => {
+    let id = null;
+    el.addEventListener('pointerdown', (e) => {
+      if (id !== null) return;
+      id = e.pointerId;
+      el.setPointerCapture(id);
+      el.classList.add('on');
+      Sound.init();
+      down();
+    });
+    const end = (e) => {
+      if (e.pointerId !== id) return;
+      id = null;
+      el.classList.remove('on');
+      if (up) up();
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+  };
+  button($('tc-fire'), () => { keys.Space = true; }, () => { keys.Space = false; });
+  button($('tc-center'), () => { keys.KeyC = true; if (state === 'playing') player.centering = true; }, () => { keys.KeyC = false; });
+  button($('tc-menu'), () => { if (state === 'playing') pause(); });
+  document.addEventListener('contextmenu', (e) => e.preventDefault());
+  // shown only while a match is running (the menus are for fingers already)
+  let shown = false;
+  setInterval(() => {
+    const want = state === 'playing';
+    if (want === shown) return;
+    shown = want;
+    root.classList.toggle('hidden', !want);
+    if (!want) for (const k of ['KeyW', 'KeyS', 'KeyA', 'KeyD', 'KeyZ', 'KeyX', 'Space', 'KeyC']) keys[k] = false;
+  }, 100);
+}
+
 window.addEventListener('blur', () => {
   for (const k in keys) keys[k] = false;
   showScoreboard(false);
