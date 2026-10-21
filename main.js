@@ -201,6 +201,8 @@ function mulberry32(seed) {
 let srand = mulberry32(1);
 const srnd = (a, b) => a + srand() * (b - a);
 
+// a phone or tablet (or ?touch=1 to try it on a computer)
+const IS_TOUCH = matchMedia('(pointer: coarse)').matches || new URLSearchParams(location.search).has('touch');
 function load(key, fallback) {
   try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
 }
@@ -285,8 +287,9 @@ const hud = {
 };
 
 // ---------- Renderer / post-processing ----------
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const MAX_DPR = IS_TOUCH ? 1.5 : 2; // phone screens have 3 pixels per dot: drawing them all would be far too slow
+const renderer = new THREE.WebGLRenderer({ antialias: !IS_TOUCH, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_DPR));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -2578,7 +2581,7 @@ function groundTexture(map) {
   }
   const L = groundLayout(map);
   const C = groundCfg();
-  const PX = C.res;
+  const PX = IS_TOUCH ? Math.min(C.res, 1024) : C.res; // (a phone's graphics memory is small)
   const u = PX / 2048; // pixel-sized details shrink on a smaller texture
   const k = PX / (ARENA * 2); // canvas pixels per world unit (canvas y runs along world z)
   const X = (x) => (x + ARENA) * k;
@@ -3536,7 +3539,7 @@ const Sound = (() => {
       return muted;
     },
     pause() { if (ctx && ctx.state === 'running') ctx.suspend().catch(() => {}); },
-    resume() { if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {}); },
+    resume() { if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {}); }, // ('interrupted' on iPhones after a call or app switch)
     setListener(x, z, yaw) {
       listener.x = x;
       listener.z = z;
@@ -6715,13 +6718,19 @@ document.addEventListener('keyup', (e) => {
 function netHush() {
   if (net.on && net.ws && net.ws.readyState === 1) { net.ws.send('{"t":"in","k":{}}'); net.lastKeys = ''; }
 }
-document.addEventListener('visibilitychange', () => { if (document.hidden) netHush(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    netHush();
+    if (!net.on && state === 'playing') pause(); // an offline match waits for you (online it cannot)
+  } else if (state === 'playing') Sound.resume();
+});
+// phones only let sound start after a touch: the very first one anywhere wakes it
+document.addEventListener('pointerdown', () => Sound.init(), { once: true });
 setInterval(() => { if (document.hidden) netHush(); }, 1000);
 // ---------- Touch controls ----------
 // Two thumb sticks and a few buttons that press the same keys as the keyboard, so everything else (online play too) is unchanged.
 // Left stick: up / down = W / S (drive), left / right = A / D (turn the hull). Right stick: left / right = Z / X (turn the turret).
-const touchOn = matchMedia('(pointer: coarse)').matches || new URLSearchParams(location.search).has('touch');
-if (touchOn) {
+if (IS_TOUCH) {
   document.body.classList.add('touch');
   const root = $('touch');
   const DEAD = 0.3;
@@ -6857,7 +6866,7 @@ const QUALITY_ORDER = ['low', 'medium', 'high'];
 const AUTO_MIN_FPS = 24; // below this for 3 seconds in a row, Auto goes down a level
 let qualityPref = load('treadstorm-quality', 'auto');
 if (qualityPref !== 'auto' && !QUALITY[qualityPref]) qualityPref = 'auto';
-let qualityLevel = qualityPref === 'auto' ? load('treadstorm-quality-auto', 'medium') : qualityPref;
+let qualityLevel = qualityPref === 'auto' ? load('treadstorm-quality-auto', IS_TOUCH ? 'low' : 'medium') : qualityPref; // Auto starts low on a phone
 if (!QUALITY[qualityLevel]) qualityLevel = 'high';
 let fpsNow = 0, autoGrace = 2, autoSlow = 0;
 const qualitySeg = $('quality-seg');
@@ -6867,7 +6876,7 @@ function applyQuality(level) {
   qualityLevel = level;
   const q = QUALITY[level];
   bloomScale = q.bloomScale ?? 0.5;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2) * q.scale);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_DPR) * q.scale);
   composer.setPixelRatio(renderer.getPixelRatio());
   for (const rt of [composer.renderTarget1, composer.renderTarget2]) {
     rt.samples = q.msaa;
